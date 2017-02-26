@@ -1,3 +1,4 @@
+import {BufferHelper} from "../buffer-helper";
 /**
  * Many Time Pad
  *
@@ -24,31 +25,8 @@ const cipherHexes = [
 console.assert(cipherHexes.length === 11);
 
 const ciphers = cipherHexes.map<Uint8Array>((hex) => {
-  return new Uint8Array(Buffer.from(hex, 'hex'));
+  return BufferHelper.toBuffer(hex, 'hex');
 });
-
-function toString(arr: Uint8Array, enc: 'utf8' | 'hex') {
-  return Buffer.from(arr.buffer).toString(enc);
-}
-
-function xor(a: Uint8Array, b: Uint8Array): Uint8Array {
-  let resultLength = Math.min(a.length, b.length);
-  let result = new Uint8Array(resultLength);
-  let idx = 0;
-  for (let idx = 0; idx < resultLength; idx++) {
-    result[idx] = a[idx] ^ b[idx];
-  }
-  return result;
-}
-
-console.assert(
-  toString(
-    xor(
-      new Uint8Array(Buffer.from('0088ff', 'hex')),
-      new Uint8Array(Buffer.from('08F08f', 'hex'))
-    ), 'hex'
-  ) === '087870'
-);
 
 let keyGuesses: Array<Array<number>> = [];
 
@@ -61,7 +39,7 @@ function addGuess(idx: number, guess: number) {
 
 ciphers.forEach((cipher1: Uint8Array, idx: number) => {
   ciphers.slice(idx + 1).forEach((cipher2: Uint8Array) => {
-    let msgXor: Uint8Array = xor(cipher1, cipher2);
+    let msgXor: Uint8Array = BufferHelper.xor(cipher1, cipher2);
     msgXor.forEach((charXor: number, cIdx: number) => {
       // If it is an alpha characters, guess that one of the message characters is a space
       if ((charXor >= 0x41 && charXor <= 0x5a) || (charXor >= 0x61 && charXor <= 0x7a)) {
@@ -86,6 +64,6 @@ keyGuesses.forEach((guesses, idx) => {
 });
 
 ciphers.forEach((cipher) => {
-  console.log(toString(xor(key, cipher), 'utf8'));
+  console.log(BufferHelper.toString(BufferHelper.xor(key, cipher), 'utf8'));
 });
 
