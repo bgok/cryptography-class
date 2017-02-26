@@ -60,20 +60,12 @@ function addGuess(idx: number, guess: number) {
 }
 
 ciphers.forEach((cipher1: Uint8Array, idx: number) => {
-  ciphers.slice(idx + 1).forEach((cipher2: Uint8Array, idx2: number) => {
+  ciphers.slice(idx + 1).forEach((cipher2: Uint8Array) => {
     let msgXor: Uint8Array = xor(cipher1, cipher2);
     msgXor.forEach((charXor: number, cIdx: number) => {
-      if (charXor >= 0x41 && charXor <= 0x5a) {
-        addGuess(cIdx, cipher1[cIdx] ^ (charXor + 0x20));
+      // If it is an alpha characters, guess that one of the message characters is a space
+      if ((charXor >= 0x41 && charXor <= 0x5a) || (charXor >= 0x61 && charXor <= 0x7a)) {
         addGuess(cIdx, cipher1[cIdx] ^ 0x20);
-        addGuess(cIdx, cipher2[cIdx] ^ (charXor + 0x20));
-        addGuess(cIdx, cipher2[cIdx] ^ 0x20);
-      }
-
-      if (charXor >= 0x61 && charXor <= 0x7a) {
-        addGuess(cIdx, cipher1[cIdx] ^ (charXor - 0x20));
-        addGuess(cIdx, cipher1[cIdx] ^ 0x20);
-        addGuess(cIdx, cipher2[cIdx] ^ (charXor - 0x20));
         addGuess(cIdx, cipher2[cIdx] ^ 0x20);
       }
     })
