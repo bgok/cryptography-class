@@ -24,8 +24,8 @@ const cipherHexes = [
 ];
 console.assert(cipherHexes.length === 11);
 
-const ciphers = cipherHexes.map<Uint8Array>((hex) => {
-  return BufferHelper.toBuffer(hex, 'hex');
+const ciphers = cipherHexes.map<Buffer>((hex) => {
+  return new Buffer(hex, 'hex');
 });
 
 let keyGuesses: Array<Array<number>> = [];
@@ -37,8 +37,8 @@ function addGuess(idx: number, guess: number) {
   keyGuesses[idx][guess] = keyGuesses[idx][guess] ? keyGuesses[idx][guess] + 1 : 1;
 }
 
-ciphers.forEach((cipher1: Uint8Array, idx: number) => {
-  ciphers.slice(idx + 1).forEach((cipher2: Uint8Array) => {
+ciphers.forEach((cipher1: Buffer, idx: number) => {
+  ciphers.slice(idx + 1).forEach((cipher2: Buffer) => {
     let msgXor: Uint8Array = BufferHelper.xor(cipher1, cipher2);
     msgXor.forEach((charXor: number, cIdx: number) => {
       // If it is an alpha characters, guess that one of the message characters is a space
@@ -50,7 +50,8 @@ ciphers.forEach((cipher1: Uint8Array, idx: number) => {
   });
 });
 
-let key = new Uint8Array(keyGuesses.length);
+// Gather the most frequent guess for each position
+let key = new Buffer(keyGuesses.length);
 
 keyGuesses.forEach((guesses, idx) => {
   guesses.reduce((largest, freq, guess) => {
@@ -64,6 +65,6 @@ keyGuesses.forEach((guesses, idx) => {
 });
 
 ciphers.forEach((cipher) => {
-  console.log(BufferHelper.toString(BufferHelper.xor(key, cipher), 'utf8'));
+  console.log(BufferHelper.xor(key, cipher).toString('utf8'));
 });
 
