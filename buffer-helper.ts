@@ -7,6 +7,17 @@ export class BufferHelper {
     }
     return result;
   }
+
+  public static increment(a: Buffer) {
+    let idx = a.length - 1;
+    while (idx) {
+      if (a[idx] !== 0xff) {
+        a[idx]++;
+        break;
+      }
+      idx--;
+    }
+  }
 }
 
 console.assert(
