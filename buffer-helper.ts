@@ -14,6 +14,8 @@ export class BufferHelper {
       if (a[idx] !== 0xff) {
         a[idx]++;
         break;
+      } else {
+        a[idx] = 0;
       }
       idx--;
     }
